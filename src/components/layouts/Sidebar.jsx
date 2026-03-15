@@ -18,6 +18,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
+import PersonalInjuryIcon from '@mui/icons-material/PersonalInjury';
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -69,15 +70,15 @@ const Sidebar = ({ open, toggleOpen }) => {
     {
       category: "Main Menu",
       items: [
-        { label: "Home", icon: <HomeOutlinedIcon />, path: "/" },
-        { label: "Dashboard", icon: <PieChartIcon />, path: "/dashboard" },
+        // { label: "Home", icon: <HomeOutlinedIcon />, path: "/" },
+        { label: "Dashboard", icon: <PieChartIcon />, path: "/" },
       ],
     },
     {
-      category: "Management",
+      category: "Records",
       items: [
-        { label: "Orders", icon: <ShoppingBagIcon />, path: "/orders" },
-        { label: "Products", icon: <SellIcon />, path: "/products" },
+        // { label: "Orders", icon: <ShoppingBagIcon />, path: "/orders" },
+        { label: "Patients", icon: <PersonalInjuryIcon />, path: "/patients" },
         {
           label: "Documents",
           icon: <FolderIcon />,
@@ -93,7 +94,12 @@ const Sidebar = ({ open, toggleOpen }) => {
               path: "/documents/reports",
             },
           ],
-        },
+        }
+      ],
+    },
+    {
+      category: "Management",
+      items: [
         { label: "Users", icon: <PeopleIcon />, path: "/users" },
       ],
     },
@@ -150,8 +156,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                             onClick={() => setDocumentsOpen(!documentsOpen)}
                             className={`flex items-center w-full cursor-pointer px-4 py-3 ${
                               isActive
-                                ? "bg-[#1F51FF] text-white"
-                                : "text-gray-800 hover:text-[#1F51FF] hover:bg-gray-100"
+                                ? "bg-[#61a48e] text-white"
+                                : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
                             } ${
                               open ? "justify-start gap-2" : "justify-center"
                             }`}
@@ -180,8 +186,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                                   }
                                   className={`flex items-center w-full cursor-pointer px-4 py-2 ${
                                     location.pathname === subItem.path
-                                      ? "bg-[#1F51FF] text-white"
-                                      : "text-gray-800 hover:text-[#1F51FF] hover:bg-gray-100"
+                                      ? "bg-[#61a48e] text-white"
+                                      : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
                                   } ${
                                     open
                                       ? "justify-start gap-2"
@@ -203,8 +209,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                         onClick={() => handleNavigation(item.path)}
                         className={`flex items-center w-full cursor-pointer px-4 py-3 ${
                           isActive
-                            ? "bg-[#1F51FF] text-white"
-                            : "text-gray-800 hover:text-[#1F51FF] hover:bg-gray-100"
+                            ? "bg-[#61a48e] text-white"
+                            : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
                         } ${open ? "justify-start gap-2" : "justify-center"}`}
                       >
                         {item.icon}
@@ -225,7 +231,7 @@ const Sidebar = ({ open, toggleOpen }) => {
                 onClick={() =>
                   handleNavigation(`/${navItem.label.toLowerCase()}`)
                 }
-                className={`flex items-center w-full cursor-pointer px-4 py-3 text-gray-800 hover:text-[#1F51FF] hover:bg-gray-100 transition-colors duration-200 ${
+                className={`flex items-center w-full cursor-pointer px-4 py-3 text-gray-800 hover:text-[#61a48e] hover:bg-gray-100 transition-colors duration-200 ${
                   open ? "justify-start gap-2" : "justify-center"
                 }`}
               >
@@ -238,7 +244,7 @@ const Sidebar = ({ open, toggleOpen }) => {
             {userProfile && (
               <div className="flex items-center gap-2 px-4 py-4 border-t">
                 {/* Avatar with first letter of firstName */}
-                <Avatar sx={{ bgcolor: "#1F51FF", width: 40, height: 40 }}>
+                <Avatar sx={{ bgcolor: "#61a48e", width: 40, height: 40 }}>
                   {userProfile.firstName
                     ? userProfile.firstName[0].toUpperCase()
                     : "U"}

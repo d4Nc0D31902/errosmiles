@@ -8,7 +8,7 @@ const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-[#20a1df]">
       <div>
         <Sidebar
           open={sidebarOpen}
