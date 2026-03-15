@@ -16,7 +16,7 @@ const App = () => {
 
   return (
     <div>
-      {!hideLayout && <Header />}
+      {/* {!hideLayout && <Header />} */}
 
       <Routes>
         <Route element={<ProtectedRoute />}>
@@ -26,7 +26,7 @@ const App = () => {
         </Route>
       </Routes>
 
-      {!hideLayout && <Footer />}
+      {/* {!hideLayout && <Footer />} */}
     </div>
   );
 };
