@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Drawer, Box } from "@mui/material";
+import { Drawer, Box, Avatar } from "@mui/material";
 import {
   MenuOutlined,
   ExpandMore,
@@ -127,7 +127,7 @@ const Sidebar = ({ open, toggleOpen }) => {
                 onClick={toggleOpen}
               >
                 <div className="h-10 w-10 rounded-full bg-gray-300" />
-                {open && <p className="font-bold text-lg m-0">Brand Name</p>}
+                {open && <p className="font-bold text-lg m-0">Errosmiles</p>}
               </div>
             </div>
 
@@ -236,8 +236,13 @@ const Sidebar = ({ open, toggleOpen }) => {
 
             {/* Authenticated User */}
             {userProfile && (
-              <div className="flex items-center gap-2 px-4 py-4 border-t ">
-                <div className="h-10 w-10 rounded-full bg-gray-300" />
+              <div className="flex items-center gap-2 px-4 py-4 border-t">
+                {/* Avatar with first letter of firstName */}
+                <Avatar sx={{ bgcolor: "#1F51FF", width: 40, height: 40 }}>
+                  {userProfile.firstName
+                    ? userProfile.firstName[0].toUpperCase()
+                    : "U"}
+                </Avatar>
                 {open && (
                   <div className="flex items-center gap-2 w-auto justify-between">
                     <div className="flex flex-col gap-0 m-0 justify-center items-start">
