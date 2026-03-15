@@ -6,6 +6,7 @@ import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import Register from "./components/user/Register";
 import Login from "./components/user/Login";
+import ProtectedRoute from "./components/route/ProtectedRoute";
 
 const App = () => {
   const location = useLocation();
@@ -18,9 +19,11 @@ const App = () => {
       {!hideLayout && <Header />}
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
       </Routes>
 
       {!hideLayout && <Footer />}

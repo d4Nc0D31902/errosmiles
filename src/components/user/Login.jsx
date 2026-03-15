@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import supabase from "../utils/Supabase";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     eid: "",
     password: "",
@@ -20,7 +23,6 @@ const Login = () => {
 
     const { eid, password } = formData;
 
-    // recreate the generated email used during registration
     const email = `${eid}@errosmiles.com`;
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -32,9 +34,7 @@ const Login = () => {
       alert(error.message);
       return;
     }
-
-    alert("Login successful");
-    console.log(data);
+    navigate("/");
   };
 
   return (
