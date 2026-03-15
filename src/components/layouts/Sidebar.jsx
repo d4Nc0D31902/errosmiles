@@ -126,7 +126,7 @@ const Sidebar = ({ open, toggleOpen }) => {
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={toggleOpen}
               >
-                <div className="h-10 w-10 rounded-full bg-gray-300" />
+                <div className="h-10 w-10 rounded-full bg-cover bg-center bg-[url('/images/logo.jpg')]"></div>
                 {open && <p className="font-bold text-lg m-0">Errosmiles</p>}
               </div>
             </div>
