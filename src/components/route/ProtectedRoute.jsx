@@ -9,12 +9,33 @@ const ProtectedRoute = () => {
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
-      setSession(data.session);
+
+      const session = data.session;
+
+      if (session) {
+        const loginTime = localStorage.getItem("loginTime");
+
+        if (loginTime) {
+          const now = Date.now();
+          const diff = now - parseInt(loginTime, 10);
+
+          const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+          if (diff > TWENTY_FOUR_HOURS) {
+            await supabase.auth.signOut();
+            localStorage.removeItem("loginTime");
+            setSession(null);
+            return;
+          }
+        }
+      }
+
+      setSession(session);
     };
 
     getSession();
   }, []);
-
+  
   // still checking session
   if (session === undefined) return null;
 

@@ -1,62 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Input, Button } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import Sidebar from "../layouts/Sidebar";
+import supabase from "../utils/Supabase";
+import dayjs from "dayjs";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
 
 const PatientList = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
-  // Sample data for the table
-  const dataSource = [
-    {
-      key: "1",
-      eid: "E001",
-      firstName: "John",
-      lastName: "Doe",
-      dob: "1990-01-01",
-      position: "Patient",
-    },
-    {
-      key: "2",
-      eid: "E002",
-      firstName: "Jane",
-      lastName: "Smith",
-      dob: "1985-06-15",
-      position: "Patient",
-    },
-  ];
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase.from("patients").select("*");
+
+      if (error) {
+        console.error("Error fetching patients:", error.message);
+      } else {
+        setPatients(data);
+        setPagination((prev) => ({
+          ...prev,
+          total: data.length,
+        }));
+      }
+
+      setLoading(false);
+    };
+
+    fetchPatients();
+  }, []);
 
   // Columns definition
   const columns = [
     {
-      title: "Employee ID",
-      dataIndex: "eid",
-      key: "eid",
-    },
-    {
       title: "First Name",
-      dataIndex: "firstName",
-      key: "firstName",
+      dataIndex: "first_name",
+      key: "first_name",
     },
     {
       title: "Last Name",
-      dataIndex: "lastName",
-      key: "lastName",
+      dataIndex: "last_name",
+      key: "last_name",
     },
     {
       title: "Date of Birth",
-      dataIndex: "dob",
-      key: "dob",
+      dataIndex: "date_of_birth",
+      key: "date_of_birth",
+      align: "center",
+      render: (dob) => (dob ? dayjs(dob).format("MM/DD/YYYY") : ""),
     },
     {
-      title: "Position",
-      dataIndex: "position",
-      key: "position",
+      title: "Action",
+      align: "center",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          icon={<EyeOutlined />}
+          onClick={() => {
+            console.log("View patient:", record);
+          }}
+        />
+      ),
     },
   ];
+
+  const filteredPatients = patients.filter((p) => {
+    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
+  // Slice for current page
+  const start = (pagination.current - 1) * pagination.pageSize;
+  const end = start + pagination.pageSize;
+  const paginatedPatients = filteredPatients.slice(start, end);
 
   return (
     <div className="min-h-screen flex bg-[#20a1df]">
@@ -71,8 +99,24 @@ const PatientList = () => {
       >
         <div className="w-full">
           <Table
-            dataSource={dataSource}
+            dataSource={paginatedPatients}
             columns={columns}
+            loading={loading}
+            rowKey="id"
+            bordered
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredPatients.length,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              showSizeChanger: true,
+              onChange: (page, pageSize) => {
+                setPagination({ ...pagination, current: page, pageSize });
+              },
+              onShowSizeChange: (current, size) => {
+                setPagination({ ...pagination, current: 1, pageSize: size });
+              },
+            }}
             title={() => (
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold">Patient List</h3>
@@ -80,13 +124,11 @@ const PatientList = () => {
                 {/* Search bar and icon button */}
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Search patients"
+                    placeholder="Search..."
                     prefix={<SearchOutlined />}
                     style={{ width: 200 }}
-                    onChange={(e) => {
-                      // Optionally handle search filtering here
-                      console.log("Search:", e.target.value);
-                    }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
 
                   <Button

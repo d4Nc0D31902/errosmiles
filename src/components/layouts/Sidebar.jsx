@@ -156,8 +156,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                             onClick={() => setDocumentsOpen(!documentsOpen)}
                             className={`flex items-center w-full cursor-pointer px-4 py-3 ${
                               isActive
-                                ? "bg-[#61a48e] text-white"
-                                : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
+                                ? "bg-[#20a1df] text-white"
+                                : "text-gray-800 hover:text-[#20a1df] hover:bg-gray-100"
                             } ${
                               open ? "justify-start gap-2" : "justify-center"
                             }`}
@@ -186,8 +186,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                                   }
                                   className={`flex items-center w-full cursor-pointer px-4 py-2 ${
                                     location.pathname === subItem.path
-                                      ? "bg-[#61a48e] text-white"
-                                      : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
+                                      ? "bg-[#20a1df] text-white"
+                                      : "text-gray-800 hover:text-[#20a1df] hover:bg-gray-100"
                                   } ${
                                     open
                                       ? "justify-start gap-2"
@@ -209,8 +209,8 @@ const Sidebar = ({ open, toggleOpen }) => {
                         onClick={() => handleNavigation(item.path)}
                         className={`flex items-center w-full cursor-pointer px-4 py-3 ${
                           isActive
-                            ? "bg-[#61a48e] text-white"
-                            : "text-gray-800 hover:text-[#61a48e] hover:bg-gray-100"
+                            ? "bg-[#20a1df] text-white"
+                            : "text-gray-800 hover:text-[#20a1df] hover:bg-gray-100"
                         } ${open ? "justify-start gap-2" : "justify-center"}`}
                       >
                         {item.icon}
@@ -231,7 +231,7 @@ const Sidebar = ({ open, toggleOpen }) => {
                 onClick={() =>
                   handleNavigation(`/${navItem.label.toLowerCase()}`)
                 }
-                className={`flex items-center w-full cursor-pointer px-4 py-3 text-gray-800 hover:text-[#61a48e] hover:bg-gray-100 transition-colors duration-200 ${
+                className={`flex items-center w-full cursor-pointer px-4 py-3 text-gray-800 hover:text-[#20a1df] hover:bg-gray-100 transition-colors duration-200 ${
                   open ? "justify-start gap-2" : "justify-center"
                 }`}
               >
@@ -244,7 +244,7 @@ const Sidebar = ({ open, toggleOpen }) => {
             {userProfile && (
               <div className="flex items-center gap-2 px-4 py-4 border-t">
                 {/* Avatar with first letter of firstName */}
-                <Avatar sx={{ bgcolor: "#61a48e", width: 40, height: 40 }}>
+                <Avatar sx={{ bgcolor: "#20a1df", width: 40, height: 40 }}>
                   {userProfile.firstName
                     ? userProfile.firstName[0].toUpperCase()
                     : "U"}

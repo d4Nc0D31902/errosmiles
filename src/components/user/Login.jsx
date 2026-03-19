@@ -22,7 +22,6 @@ const Login = () => {
     e.preventDefault();
 
     const { eid, password } = formData;
-
     const email = `${eid}@errosmiles.com`;
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -34,6 +33,10 @@ const Login = () => {
       alert(error.message);
       return;
     }
+
+    // store login timestamp
+    localStorage.setItem("loginTime", Date.now());
+
     navigate("/");
   };
 
