@@ -4,6 +4,7 @@ import { SearchOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import Sidebar from "../layouts/Sidebar";
 import supabase from "../utils/Supabase";
 import dayjs from "dayjs";
+import AddPatient from "./AddPatient";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -18,6 +19,19 @@ const PatientList = () => {
     pageSize: 10,
     total: 0,
   });
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+  const openAddModal = () => {
+    setSelectedPatient(null);
+    setModalVisible(true);
+  };
+
+  const openViewModal = (patient) => {
+    setSelectedPatient(patient);
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -100,7 +114,20 @@ const PatientList = () => {
         <div className="w-full">
           <Table
             dataSource={paginatedPatients}
-            columns={columns}
+            columns={columns.map((col) =>
+              col.key === "action"
+                ? {
+                    ...col,
+                    render: (_, record) => (
+                      <Button
+                        type="primary"
+                        icon={<EyeOutlined />}
+                        onClick={() => openViewModal(record)}
+                      />
+                    ),
+                  }
+                : col,
+            )}
             loading={loading}
             rowKey="id"
             bordered
@@ -120,8 +147,6 @@ const PatientList = () => {
             title={() => (
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold">Patient List</h3>
-
-                {/* Search bar and icon button */}
                 <div className="flex gap-2">
                   <Input
                     placeholder="Search..."
@@ -130,17 +155,23 @@ const PatientList = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
-                    onClick={() => console.log("Add patient")}
+                    onClick={openAddModal}
                   />
                 </div>
               </div>
             )}
           />
         </div>
+
+        {/* Place the modal here, after the table */}
+        <AddPatient
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          patient={selectedPatient}
+        />
       </div>
     </div>
   );
