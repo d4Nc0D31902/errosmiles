@@ -28,32 +28,52 @@ const PatientList = () => {
     setModalVisible(true);
   };
 
-  const openViewModal = (patient) => {
-    setSelectedPatient(patient);
-    setModalVisible(true);
+  const fetchPatients = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .order("last_name", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching patients:", error.message);
+    } else {
+      setPatients(data);
+      setPagination((prev) => ({
+        ...prev,
+        total: data.length,
+      }));
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      setLoading(true);
-
-      const { data, error } = await supabase.from("patients").select("*");
-
-      if (error) {
-        console.error("Error fetching patients:", error.message);
-      } else {
-        setPatients(data);
-        setPagination((prev) => ({
-          ...prev,
-          total: data.length,
-        }));
-      }
-
-      setLoading(false);
-    };
-
     fetchPatients();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchPatients = async () => {
+  //     setLoading(true);
+
+  //     const { data, error } = await supabase.from("patients").select("*");
+
+  //     if (error) {
+  //       console.error("Error fetching patients:", error.message);
+  //     } else {
+  //       setPatients(data);
+  //       setPagination((prev) => ({
+  //         ...prev,
+  //         total: data.length,
+  //       }));
+  //     }
+
+  //     setLoading(false);
+  //   };
+
+  //   fetchPatients();
+  // }, []);
 
   // Columns definition
   const columns = [
@@ -113,21 +133,8 @@ const PatientList = () => {
       >
         <div className="w-full">
           <Table
+            columns={columns}
             dataSource={paginatedPatients}
-            columns={columns.map((col) =>
-              col.key === "action"
-                ? {
-                    ...col,
-                    render: (_, record) => (
-                      <Button
-                        type="primary"
-                        icon={<EyeOutlined />}
-                        onClick={() => openViewModal(record)}
-                      />
-                    ),
-                  }
-                : col,
-            )}
             loading={loading}
             rowKey="id"
             bordered
@@ -171,6 +178,7 @@ const PatientList = () => {
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
           patient={selectedPatient}
+          onSuccess={fetchPatients}
         />
       </div>
     </div>

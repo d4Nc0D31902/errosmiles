@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const AddPatient = ({ visible, onClose, patient }) => {
+const AddPatient = ({ visible, onClose, patient, onSuccess }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -25,7 +25,6 @@ const AddPatient = ({ visible, onClose, patient }) => {
   const handleSubmit = async (values) => {
     try {
       if (patient) {
-        // Update existing patient
         const { error } = await supabase
           .from("patients")
           .update({
@@ -39,7 +38,6 @@ const AddPatient = ({ visible, onClose, patient }) => {
         if (error) throw error;
         message.success("Patient updated successfully!");
       } else {
-        // Add new patient
         const { error } = await supabase.from("patients").insert([
           {
             ...values,
@@ -53,7 +51,8 @@ const AddPatient = ({ visible, onClose, patient }) => {
         message.success("Patient added successfully!");
       }
 
-      onClose();
+      onClose(); 
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       message.error("Failed to save patient.");
@@ -67,62 +66,95 @@ const AddPatient = ({ visible, onClose, patient }) => {
       onCancel={onClose}
       footer={null}
       destroyOnClose
+      width={800}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item
-          label="First Name"
-          name="first_name"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
+        {/* Name */}
+        <div className="flex gap-2 w-full">
+          <Form.Item
+            className="flex-1"
+            label="First Name"
+            name="first_name"
+            rules={[{ required: true }]}
+            required
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item label="Middle Name" name="middle_name">
-          <Input />
-        </Form.Item>
+          <Form.Item
+            className="flex-1"
+            label="Middle Name"
+            name="middle_name"
+            required
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Last Name"
-          name="last_name"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            className="flex-1"
+            label="Last Name"
+            name="last_name"
+            rules={[{ required: true }]}
+            required
+          >
+            <Input />
+          </Form.Item>
+        </div>
 
-        <Form.Item label="Date of Birth" name="date_of_birth">
-          <DatePicker style={{ width: "100%" }} />
-        </Form.Item>
+        {/* Birthday & Gender */}
+        <div className="flex gap-2 w-full">
+          <Form.Item
+            label="Date of Birth"
+            name="date_of_birth"
+            className="flex-1"
+            required
+          >
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
 
-        <Form.Item label="Gender" name="gender">
-          <Select>
-            <Option value="male">Male</Option>
-            <Option value="female">Female</Option>
-            <Option value="other">Other</Option>
-          </Select>
-        </Form.Item>
+          <Form.Item label="Gender" name="gender" className="flex-1" required>
+            <Select>
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+            </Select>
+          </Form.Item>
+        </div>
 
-        <Form.Item label="Phone" name="phone">
-          <Input />
-        </Form.Item>
+        {/* Contact */}
+        <div className="flex gap-2 w-full">
+          <Form.Item label="Phone" name="phone" className="flex-1" required>
+            <Input />
+          </Form.Item>
 
-        <Form.Item label="Email" name="email">
-          <Input type="email" />
-        </Form.Item>
+          <Form.Item label="Email" name="email" className="flex-1" required>
+            <Input type="email" />
+          </Form.Item>
+        </div>
 
-        <Form.Item label="Address" name="address">
+        {/* Address */}
+        <Form.Item label="Address" name="address" required>
           <Input.TextArea rows={2} />
         </Form.Item>
 
-        <Form.Item label="Emergency Contact Name" name="emergency_contact_name">
-          <Input />
-        </Form.Item>
+        <div className="flex gap-2 w-full">
+          <Form.Item
+            className="flex-1"
+            label="Emergency Contact Name"
+            name="emergency_contact_name"
+            required
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Emergency Contact Phone"
-          name="emergency_contact_phone"
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            className="flex-1"
+            label="Emergency Contact Phone"
+            name="emergency_contact_phone"
+            required
+          >
+            <Input />
+          </Form.Item>
+        </div>
 
         <Form.Item label="Allergies" name="allergies">
           <Input.TextArea rows={2} />
