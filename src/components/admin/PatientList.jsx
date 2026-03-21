@@ -16,7 +16,7 @@ const PatientList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 20,
     total: 0,
   });
 
@@ -94,20 +94,20 @@ const PatientList = () => {
       align: "center",
       render: (dob) => (dob ? dayjs(dob).format("MM/DD/YYYY") : ""),
     },
-    {
-      title: "Action",
-      align: "center",
-      key: "action",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          icon={<EyeOutlined />}
-          onClick={() => {
-            console.log("View patient:", record);
-          }}
-        />
-      ),
-    },
+    // {
+    //   title: "Action",
+    //   align: "center",
+    //   key: "action",
+    //   render: (_, record) => (
+    //     <Button
+    //       type="primary"
+    //       icon={<EyeOutlined />}
+    //       onClick={() => {
+    //         console.log("View patient:", record);
+    //       }}
+    //     />
+    //   ),
+    // },
   ];
 
   const filteredPatients = patients.filter((p) => {
@@ -138,11 +138,18 @@ const PatientList = () => {
             loading={loading}
             rowKey="id"
             bordered
+            rowClassName={() => "cursor-pointer"}
+            onRow={(record) => ({
+              onClick: () => {
+                console.log("Selected patient id:", record.id);
+                setSelectedPatient(record);
+              },
+            })}
             pagination={{
               current: pagination.current,
               pageSize: pagination.pageSize,
               total: filteredPatients.length,
-              pageSizeOptions: ["10", "20", "50", "100"],
+              pageSizeOptions: ["20", "50", "100"],
               showSizeChanger: true,
               onChange: (page, pageSize) => {
                 setPagination({ ...pagination, current: page, pageSize });
