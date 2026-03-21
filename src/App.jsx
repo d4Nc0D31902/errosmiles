@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 
 import Home from "./components/Home";
 import PatientList from "./components/admin/PatientList";
+import ViewPatient from "./components/admin/ViewPatient";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import Register from "./components/user/Register";
@@ -23,6 +24,7 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
           <Route path="/patients" element={<PatientList />} />
+          <Route path="/patient/:id" element={<ViewPatient />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Route>

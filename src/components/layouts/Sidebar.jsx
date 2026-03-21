@@ -18,7 +18,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
-import PersonalInjuryIcon from '@mui/icons-material/PersonalInjury';
+import PersonalInjuryIcon from "@mui/icons-material/PersonalInjury";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -78,7 +78,12 @@ const Sidebar = ({ open, toggleOpen }) => {
       category: "Records",
       items: [
         // { label: "Orders", icon: <ShoppingBagIcon />, path: "/orders" },
-        { label: "Patients", icon: <PersonalInjuryIcon />, path: "/patients" },
+        {
+          label: "Patients",
+          icon: <PersonalInjuryIcon />,
+          path: "/patients",
+          matchPaths: ["/patients", "/patient"],
+        },
         {
           label: "Documents",
           icon: <FolderIcon />,
@@ -94,14 +99,12 @@ const Sidebar = ({ open, toggleOpen }) => {
               path: "/documents/reports",
             },
           ],
-        }
+        },
       ],
     },
     {
       category: "Management",
-      items: [
-        { label: "Users", icon: <PeopleIcon />, path: "/users" },
-      ],
+      items: [{ label: "Users", icon: <PeopleIcon />, path: "/users" }],
     },
   ];
 
@@ -147,7 +150,9 @@ const Sidebar = ({ open, toggleOpen }) => {
                     </p>
                   )}
                   {category.items.map((item) => {
-                    const isActive = location.pathname === item.path;
+                    const isActive = item.matchPaths?.some((path) =>
+                      location.pathname.startsWith(path),
+                    );
 
                     if (item.items) {
                       return (

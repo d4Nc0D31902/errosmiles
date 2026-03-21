@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Table, Input, Button } from "antd";
 import { SearchOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import Sidebar from "../layouts/Sidebar";
@@ -10,6 +11,7 @@ const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
 
 const PatientList = () => {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,28 +55,6 @@ const PatientList = () => {
     fetchPatients();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchPatients = async () => {
-  //     setLoading(true);
-
-  //     const { data, error } = await supabase.from("patients").select("*");
-
-  //     if (error) {
-  //       console.error("Error fetching patients:", error.message);
-  //     } else {
-  //       setPatients(data);
-  //       setPagination((prev) => ({
-  //         ...prev,
-  //         total: data.length,
-  //       }));
-  //     }
-
-  //     setLoading(false);
-  //   };
-
-  //   fetchPatients();
-  // }, []);
-
   // Columns definition
   const columns = [
     {
@@ -94,20 +74,6 @@ const PatientList = () => {
       align: "center",
       render: (dob) => (dob ? dayjs(dob).format("MM/DD/YYYY") : ""),
     },
-    // {
-    //   title: "Action",
-    //   align: "center",
-    //   key: "action",
-    //   render: (_, record) => (
-    //     <Button
-    //       type="primary"
-    //       icon={<EyeOutlined />}
-    //       onClick={() => {
-    //         console.log("View patient:", record);
-    //       }}
-    //     />
-    //   ),
-    // },
   ];
 
   const filteredPatients = patients.filter((p) => {
@@ -142,7 +108,7 @@ const PatientList = () => {
             onRow={(record) => ({
               onClick: () => {
                 console.log("Selected patient id:", record.id);
-                setSelectedPatient(record);
+                navigate(`/patient/${record.id}`);
               },
             })}
             pagination={{
