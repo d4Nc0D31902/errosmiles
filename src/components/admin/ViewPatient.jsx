@@ -284,6 +284,7 @@ const ViewPatient = () => {
                     pagination={{ pageSize: 10 }}
                     onRow={(record) => ({
                       onClick: () => showEditModal(record),
+                      style: { cursor: "pointer" },
                     })}
                   />
                 )}

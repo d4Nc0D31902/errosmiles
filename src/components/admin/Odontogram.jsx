@@ -9,11 +9,11 @@ const MyOdontogram = ({ patientId }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchDentalChart = async () => {
+    const fetchPatientRecords = async () => {
       if (!patientId) return;
 
       const { data, error } = await supabase
-        .from("dental_chart")
+        .from("patient_records") 
         .select("*")
         .eq("patient_id", patientId);
 
@@ -24,15 +24,15 @@ const MyOdontogram = ({ patientId }) => {
 
       if (data) {
         const ids = data
-          .filter((t) => t.tooth_number)
-          .map((t) => `teeth-${t.tooth_number}`);
+          .filter((record) => record.tooth_number)
+          .map((record) => `teeth-${record.tooth_number}`);
 
         setSelectedIds(ids);
         setLoaded(true);
       }
     };
 
-    fetchDentalChart();
+    fetchPatientRecords();
   }, [patientId]);
 
   const handleChange = (teeth) => {

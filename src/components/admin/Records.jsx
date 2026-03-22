@@ -18,18 +18,52 @@ const Records = ({ patientId }) => {
   useEffect(() => {
     const fetchRecords = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+
+      // Fetch patient records
+      const { data: recordData, error: recordError } = await supabase
         .from("patient_records")
         .select("*")
         .eq("patient_id", patientId)
-        .order("visit_date", { ascending: false });
+        .order("record_date", { ascending: false });
 
-      if (!error) {
-        setRecords(data || []);
-      } else {
-        console.error("Error fetching patient records:", error);
+      if (recordError) {
+        console.error("Error fetching patient records:", recordError);
+        setLoading(false);
+        return;
       }
 
+      if (!recordData || recordData.length === 0) {
+        setRecords([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch notes and dentist profiles for each record
+      const recordsWithExtras = await Promise.all(
+        recordData.map(async (record) => {
+          // Fetch dentist profile
+          const { data: dentistData } = await supabase
+            .from("profiles")
+            .select("firstName, lastName")
+            .eq("id", record.dentist_id)
+            .single();
+
+          // Fetch notes
+          const { data: notesData } = await supabase
+            .from("patient_record_notes")
+            .select("id, note_text, created_at")
+            .eq("record_id", record.id)
+            .order("created_at", { ascending: true });
+
+          return {
+            ...record,
+            dentist: dentistData || null,
+            notes: notesData || [],
+          };
+        }),
+      );
+
+      setRecords(recordsWithExtras);
       setLoading(false);
     };
 
@@ -53,50 +87,43 @@ const Records = ({ patientId }) => {
   return (
     <Box sx={{ maxWidth: 600, p: 2 }}>
       <Stepper orientation="vertical" nonLinear>
-        {records.map((record, index) => (
+        {records.map((record) => (
           <Step key={record.id} active>
             <StepLabel>
-              {record.visit_date
-                ? new Date(record.visit_date).toLocaleDateString()
-                : "Unknown Date"}{" "}
-              - {record.chief_complaint || "No chief complaint"}
+              {record.record_date
+                ? new Date(record.record_date).toLocaleDateString()
+                : "Unknown Date"}
             </StepLabel>
             <StepContent>
               <Typography>
-                <strong>Dentist:</strong> {record.dentist_name || "N/A"}
+                <strong>Dentist:</strong>{" "}
+                {record.dentist
+                  ? `${record.dentist.firstName} ${record.dentist.lastName}`
+                  : "N/A"}
               </Typography>
               <Typography>
                 <strong>Diagnosis:</strong> {record.diagnosis || "N/A"}
               </Typography>
               <Typography>
-                <strong>Treatment Plan:</strong>{" "}
-                {record.treatment_plan || "N/A"}
-              </Typography>
-              <Typography>
-                <strong>Procedures Done:</strong>{" "}
-                {record.procedures_done || "N/A"}
+                <strong>Treatment:</strong> {record.treatment || "N/A"}
               </Typography>
               <Typography>
                 <strong>Tooth Number:</strong> {record.tooth_number || "N/A"}
               </Typography>
-              <Typography>
-                <strong>Procedure Type:</strong>{" "}
-                {record.procedure_type || "N/A"}
-              </Typography>
-              <Typography>
-                <strong>Prescription:</strong> {record.prescription || "N/A"}
-              </Typography>
-              <Typography>
-                <strong>Cost:</strong> {record.cost ? `$${record.cost}` : "N/A"}
-              </Typography>
-              <Typography>
-                <strong>Payment Status:</strong>{" "}
-                {record.payment_status || "N/A"}
-              </Typography>
-              {record.notes && (
-                <Typography>
-                  <strong>Notes:</strong> {record.notes}
-                </Typography>
+
+              {record.notes.length > 0 && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="subtitle2">Notes:</Typography>
+                  {record.notes.map((note) => (
+                    <Typography
+                      key={note.id}
+                      variant="body2"
+                      sx={{ ml: 2, mb: 0.5 }}
+                    >
+                      - {note.note_text}
+                    </Typography>
+                  ))}
+                </Box>
               )}
             </StepContent>
           </Step>
