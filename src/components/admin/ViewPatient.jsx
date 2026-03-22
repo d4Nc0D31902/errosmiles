@@ -142,7 +142,7 @@ const ViewPatient = () => {
         className="flex-1 flex flex-col items-start justify-start transition-all duration-300 rounded-md bg-white p-5 gap-5"
         style={{ marginLeft: sidebarOpen ? FULL_WIDTH : MINI_WIDTH }}
       >
-        {/* Breadcrumb */}
+        {/* Breadcrumb & Create Appointment */}
         <div className="flex w-full p-3 justify-between">
           <div>
             <Breadcrumbs aria-label="breadcrumb">
@@ -213,20 +213,24 @@ const ViewPatient = () => {
           </Box>
 
           <Box className="p-4">
+            {/* Overview */}
             {tabValue === 0 && (
               <PatientDetails patient={patient} loading={loading} />
             )}
+            {/* Records */}
             {tabValue === 1 && (
               <div className="flex gap-2">
                 {/* Odontogram */}
-                <div className="flex-1 p-4">
+                <div className="p-4 w-[30%]">
                   <MyOdontogram patientId={id} />
                 </div>
-                <div className="border flex-1">
+                {/* Records */}
+                <div className="flex-1 bg-gray-100 rounded-md">
                   <Records patientId={id} />
                 </div>
               </div>
             )}
+            {/* Appointments */}
             {tabValue === 2 && (
               <div className="w-full">
                 {appointmentsLoading ? (
