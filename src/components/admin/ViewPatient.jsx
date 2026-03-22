@@ -12,6 +12,7 @@ import {
   Tab,
   Box,
   Divider,
+  Skeleton,
 } from "@mui/material";
 import { Table, Input } from "antd";
 
@@ -27,12 +28,16 @@ const ViewPatient = () => {
 
   const [tabValue, setTabValue] = useState(0);
 
+  const [loading, setLoading] = useState(true);
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
   useEffect(() => {
     const fetchPatient = async () => {
+      setLoading(true);
+
       const { data, error } = await supabase
         .from("patients")
         .select("*")
@@ -40,6 +45,8 @@ const ViewPatient = () => {
         .single();
 
       if (!error) setPatient(data);
+
+      setLoading(false);
     };
 
     if (id) fetchPatient();
@@ -89,35 +96,46 @@ const ViewPatient = () => {
               Patients
             </Link>
 
-            <Typography color="text.primary">{patient && "Patient"}</Typography>
+            <Typography color="text.primary">
+              {loading ? <Skeleton width={80} /> : "Patient"}
+            </Typography>
           </Breadcrumbs>
         </div>
         {/* Divider */}
         <Divider className="w-full" />
         {/* Patient Name */}
         <div className="w-full text-xl">
-          <Table
-            columns={columns}
-            dataSource={dataSource}
-            pagination={false}
-            bordered
-            rowKey="id"
-            size="middle"
-            style={{ fontSize: "18px" }}
-            components={{
-              header: {
-                cell: (props) => (
-                  <th
-                    {...props}
-                    style={{ fontSize: "19px", fontWeight: 600 }}
-                  />
-                ),
-              },
-              body: {
-                cell: (props) => <td {...props} style={{ fontSize: "18px" }} />,
-              },
-            }}
-          />
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton height={40} />
+              <Skeleton height={40} />
+            </div>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              pagination={false}
+              bordered
+              rowKey="id"
+              size="middle"
+              style={{ fontSize: "18px" }}
+              components={{
+                header: {
+                  cell: (props) => (
+                    <th
+                      {...props}
+                      style={{ fontSize: "19px", fontWeight: 600 }}
+                    />
+                  ),
+                },
+                body: {
+                  cell: (props) => (
+                    <td {...props} style={{ fontSize: "18px" }} />
+                  ),
+                },
+              }}
+            />
+          )}
         </div>
         {/* Tabs */}
         <div className="w-full">
@@ -130,16 +148,25 @@ const ViewPatient = () => {
           </Box>
 
           <Box className="p-4">
-            {tabValue === 0 && patient && (
+            {tabValue === 0 && (
               <div className="w-full flex flex-col">
                 <div className="flex gap-5 w-full justify-center">
                   <div>
                     <label>Date of Birth</label>
-                    <Input value={patient.date_of_birth} disabled />
+                    {loading ? (
+                      <Skeleton width={150} height={40} />
+                    ) : (
+                      <Input value={patient?.date_of_birth} disabled />
+                    )}
                   </div>
+
                   <div>
                     <label>Gender</label>
-                    <Input value={patient.gender || ""} disabled />
+                    {loading ? (
+                      <Skeleton width={150} height={40} />
+                    ) : (
+                      <Input value={patient?.gender || ""} disabled />
+                    )}
                   </div>
                 </div>
               </div>
