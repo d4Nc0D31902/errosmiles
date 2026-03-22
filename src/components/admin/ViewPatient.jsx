@@ -14,11 +14,12 @@ import {
   Divider,
   Skeleton,
 } from "@mui/material";
-import { Button, Table, Input, Tag } from "antd";
+import { Button, Table, Modal, Tag } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import MyOdontogram from "./Odontogram";
 import Records from "./Records";
 import PatientDetails from "./PatientDetails";
+import AddAppointment from "./AddAppointment";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -36,6 +37,11 @@ const ViewPatient = () => {
 
   const [appointments, setAppointments] = useState([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => setIsModalVisible(true);
+  const hideModal = () => setIsModalVisible(false);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -59,23 +65,46 @@ const ViewPatient = () => {
     if (id) fetchPatient();
   }, [id]);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!id) return;
+  const fetchAppointments = async () => {
+    if (!id) return;
 
-      setAppointmentsLoading(true);
+    setAppointmentsLoading(true);
 
-      const { data, error } = await supabase
-        .from("appointments")
-        .select("*")
-        .eq("patient_id", id)
-        .order("appointment_date", { ascending: false });
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from("appointments")
+      .select("*")
+      .eq("patient_id", id)
+      .order("appointment_date", { ascending: false });
 
-      if (!error) setAppointments(data || []);
-
+    if (appointmentsError) {
+      console.error(appointmentsError);
+      setAppointments([]);
       setAppointmentsLoading(false);
-    };
+      return;
+    }
 
+    const appointmentsWithReason = await Promise.all(
+      appointmentsData.map(async (appt) => {
+        const { data: reasonsData } = await supabase
+          .from("appointment_reasons")
+          .select("reason_text")
+          .eq("appointment_id", appt.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        return {
+          ...appt,
+          reason:
+            reasonsData && reasonsData.length ? reasonsData[0].reason_text : "",
+        };
+      }),
+    );
+
+    setAppointments(appointmentsWithReason);
+    setAppointmentsLoading(false);
+  };
+
+  useEffect(() => {
     fetchAppointments();
   }, [id]);
 
@@ -161,7 +190,7 @@ const ViewPatient = () => {
             </Breadcrumbs>
           </div>
           <div>
-            <Button type="primary" icon={<PlusOutlined />}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
               Create Appointment
             </Button>
           </div>
@@ -252,6 +281,20 @@ const ViewPatient = () => {
             )}
           </Box>
         </div>
+        {/* Add Appointment Modal */}
+        <Modal
+          title="Create Appointment"
+          open={isModalVisible}
+          onCancel={hideModal}
+          footer={null} // Optional: if you want to provide custom buttons inside AddAppointment
+          width={600}
+        >
+          <AddAppointment
+            patientId={id}
+            onClose={hideModal}
+            onSuccess={() => fetchAppointments()}
+          />
+        </Modal>
       </div>
     </div>
   );
