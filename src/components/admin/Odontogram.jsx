@@ -41,7 +41,10 @@ const MyOdontogram = ({ patientId }) => {
 
   if (!loaded) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center border rounded-md p-5">
+      <div
+        className="w-full flex items-center justify-center border rounded-md p-5"
+        style={{ height: 600 }}
+      >
         <Skeleton
           variant="rectangular"
           width="100%"

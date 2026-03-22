@@ -15,8 +15,8 @@ import {
   Skeleton,
 } from "@mui/material";
 import { Table, Input, Tag } from "antd";
-import MyOdontogram from "./Odontogram"
-
+import MyOdontogram from "./Odontogram";
+import Records from "./Records";
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
 
@@ -316,7 +316,9 @@ const ViewPatient = () => {
                 <div className="flex-1 p-4">
                   <MyOdontogram patientId={id} />
                 </div>
-                <div className="border flex-1"></div>
+                <div className="border flex-1">
+                  <Records patientId={id} />
+                </div>
               </div>
             )}
             {tabValue === 2 && (
