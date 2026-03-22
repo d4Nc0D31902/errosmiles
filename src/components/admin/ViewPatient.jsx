@@ -149,25 +149,109 @@ const ViewPatient = () => {
 
           <Box className="p-4">
             {tabValue === 0 && (
-              <div className="w-full flex flex-col">
-                <div className="flex gap-5 w-full justify-center">
-                  <div>
-                    <label>Date of Birth</label>
-                    {loading ? (
-                      <Skeleton width={150} height={40} />
-                    ) : (
-                      <Input value={patient?.date_of_birth} disabled />
-                    )}
+              <div className="w-full flex flex-col gap-6">
+                {/* BASIC INFO */}
+                <div>
+                  <h3 className="font-semibold mb-2">Basic Information</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: "Date of Birth", value: patient?.date_of_birth },
+                      { label: "Gender", value: patient?.gender },
+                    ].map((field) => (
+                      <div key={field.label}>
+                        <label>{field.label}</label>
+                        {loading ? (
+                          <Skeleton height={40} />
+                        ) : (
+                          <Input value={field.value || ""} disabled />
+                        )}
+                      </div>
+                    ))}
                   </div>
+                </div>
 
-                  <div>
-                    <label>Gender</label>
-                    {loading ? (
-                      <Skeleton width={150} height={40} />
-                    ) : (
-                      <Input value={patient?.gender || ""} disabled />
-                    )}
+                {/* CONTACT INFO */}
+                <div>
+                  <h3 className="font-semibold mb-2">Contact Information</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: "Phone", value: patient?.phone },
+                      { label: "Email", value: patient?.email },
+                      { label: "Address", value: patient?.address },
+                    ].map((field) => (
+                      <div key={field.label}>
+                        <label>{field.label}</label>
+                        {loading ? (
+                          <Skeleton height={40} />
+                        ) : (
+                          <Input value={field.value || ""} disabled />
+                        )}
+                      </div>
+                    ))}
                   </div>
+                </div>
+
+                {/* EMERGENCY CONTACT */}
+                <div>
+                  <h3 className="font-semibold mb-2">Emergency Contact</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      {
+                        label: "Contact Name",
+                        value: patient?.emergency_contact_name,
+                      },
+                      {
+                        label: "Contact Phone",
+                        value: patient?.emergency_contact_phone,
+                      },
+                    ].map((field) => (
+                      <div key={field.label}>
+                        <label>{field.label}</label>
+                        {loading ? (
+                          <Skeleton height={40} />
+                        ) : (
+                          <Input value={field.value || ""} disabled />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* MEDICAL INFO */}
+                <div>
+                  <h3 className="font-semibold mb-2">Medical Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { label: "Allergies", value: patient?.allergies },
+                      {
+                        label: "Medical Conditions",
+                        value: patient?.medical_conditions,
+                      },
+                    ].map((field) => (
+                      <div key={field.label}>
+                        <label>{field.label}</label>
+                        {loading ? (
+                          <Skeleton height={40} />
+                        ) : (
+                          <Input value={field.value || ""} disabled />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* NOTES */}
+                <div>
+                  <h3 className="font-semibold mb-2">Notes</h3>
+                  {loading ? (
+                    <Skeleton height={60} />
+                  ) : (
+                    <Input.TextArea
+                      value={patient?.notes || ""}
+                      rows={3}
+                      disabled
+                    />
+                  )}
                 </div>
               </div>
             )}
