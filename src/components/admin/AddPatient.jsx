@@ -114,8 +114,8 @@ const AddPatient = ({ visible, onClose, patient, onSuccess }) => {
 
           <Form.Item label="Gender" name="gender" className="flex-1" required>
             <Select>
-              <Option value="male">Male</Option>
-              <Option value="female">Female</Option>
+              <Option value="Male">Male</Option>
+              <Option value="Female">Female</Option>
             </Select>
           </Form.Item>
         </div>
