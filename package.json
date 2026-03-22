@@ -25,6 +25,7 @@
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",
     "react-helmet": "^6.1.0",
+    "react-odontogram": "^0.5.5",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.1",
     "redux": "^5.0.1",

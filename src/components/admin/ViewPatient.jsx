@@ -14,7 +14,8 @@ import {
   Divider,
   Skeleton,
 } from "@mui/material";
-import { Table, Input } from "antd";
+import { Table, Input, Tag } from "antd";
+import MyOdontogram from "./Odontogram"
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -29,6 +30,9 @@ const ViewPatient = () => {
   const [tabValue, setTabValue] = useState(0);
 
   const [loading, setLoading] = useState(true);
+
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -52,6 +56,26 @@ const ViewPatient = () => {
     if (id) fetchPatient();
   }, [id]);
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!id) return;
+
+      setAppointmentsLoading(true);
+
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .eq("patient_id", id)
+        .order("appointment_date", { ascending: false });
+
+      if (!error) setAppointments(data || []);
+
+      setAppointmentsLoading(false);
+    };
+
+    fetchAppointments();
+  }, [id]);
+
   const columns = [
     {
       title: "First Name",
@@ -71,6 +95,37 @@ const ViewPatient = () => {
   ];
 
   const dataSource = patient ? [patient] : [];
+
+  const appointmentColumns = [
+    {
+      title: "Date",
+      dataIndex: "appointment_date",
+      key: "appointment_date",
+      render: (value) => new Date(value).toLocaleString(),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        const color =
+          status === "completed"
+            ? "green"
+            : status === "scheduled"
+              ? "blue"
+              : status === "cancelled"
+                ? "red"
+                : "default";
+
+        return <Tag color={color}>{status?.toUpperCase()}</Tag>;
+      },
+    },
+    {
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
+    },
+  ];
 
   return (
     <div className="min-h-screen flex bg-[#20a1df] p-6">
@@ -255,8 +310,34 @@ const ViewPatient = () => {
                 </div>
               </div>
             )}
-            {tabValue === 1 && <div>Medical Records Content</div>}
-            {tabValue === 2 && <div>Appointments Content</div>}
+            {tabValue === 1 && (
+              <div className="flex gap-2">
+                {/* Odontogram */}
+                <div className="flex-1 p-4">
+                  <MyOdontogram patientId={id} />
+                </div>
+                <div className="border flex-1"></div>
+              </div>
+            )}
+            {tabValue === 2 && (
+              <div className="w-full">
+                {appointmentsLoading ? (
+                  <div className="flex flex-col gap-2">
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
+                  </div>
+                ) : (
+                  <Table
+                    columns={appointmentColumns}
+                    dataSource={appointments}
+                    rowKey="id"
+                    bordered
+                    pagination={{ pageSize: 5 }}
+                  />
+                )}
+              </div>
+            )}
           </Box>
         </div>
       </div>
