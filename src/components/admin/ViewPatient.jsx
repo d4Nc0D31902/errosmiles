@@ -20,6 +20,7 @@ import MyOdontogram from "./Odontogram";
 import Records from "./Records";
 import PatientDetails from "./PatientDetails";
 import AddAppointment from "./AddAppointment";
+import UpdateAppointment from "./UpdateAppointment";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -27,21 +28,27 @@ const FULL_WIDTH = 250;
 const ViewPatient = () => {
   const { id } = useParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const navigate = useNavigate();
   const [patient, setPatient] = useState(null);
-
   const [tabValue, setTabValue] = useState(0);
-
   const [loading, setLoading] = useState(true);
-
   const [appointments, setAppointments] = useState([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
-
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const showModal = () => setIsModalVisible(true);
   const hideModal = () => setIsModalVisible(false);
+
+  const showEditModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsEditModalVisible(true);
+  };
+  const hideEditModal = () => {
+    setSelectedAppointment(null);
+    setIsEditModalVisible(false);
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -274,7 +281,10 @@ const ViewPatient = () => {
                     dataSource={appointments}
                     rowKey="id"
                     bordered
-                    pagination={{ pageSize: 5 }}
+                    pagination={{ pageSize: 10 }}
+                    onRow={(record) => ({
+                      onClick: () => showEditModal(record),
+                    })}
                   />
                 )}
               </div>
@@ -286,7 +296,7 @@ const ViewPatient = () => {
           title="Create Appointment"
           open={isModalVisible}
           onCancel={hideModal}
-          footer={null} // Optional: if you want to provide custom buttons inside AddAppointment
+          footer={null}
           width={600}
         >
           <AddAppointment
@@ -294,6 +304,21 @@ const ViewPatient = () => {
             onClose={hideModal}
             onSuccess={() => fetchAppointments()}
           />
+        </Modal>
+        {/* Update Appointment */}
+        <Modal
+          open={isEditModalVisible}
+          onCancel={hideEditModal}
+          footer={null}
+          width={400}
+        >
+          {selectedAppointment && (
+            <UpdateAppointment
+              appointment={selectedAppointment}
+              onClose={hideEditModal}
+              onSuccess={() => fetchAppointments()}
+            />
+          )}
         </Modal>
       </div>
     </div>
