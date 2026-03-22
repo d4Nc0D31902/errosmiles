@@ -74,7 +74,6 @@ const PatientDetails = ({ patient, loading }) => {
     <div className="w-full flex flex-col gap-6">
       {/* BASIC INFO */}
       <div>
-        <h3 className="font-semibold mb-2">Basic Information</h3>
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label>Date of Birth</label>

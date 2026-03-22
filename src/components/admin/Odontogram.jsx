@@ -56,7 +56,7 @@ const MyOdontogram = ({ patientId }) => {
   }
 
   return (
-    <div className="w-full rounded-md p-5 bg-gray-100 shadow">
+    <div className="w-full rounded-mdshadow">
       {/* Title */}
       <h3 className="text-lg font-semibold mb-2 text-center">Odontogram</h3>
 

@@ -257,7 +257,7 @@ const ViewPatient = () => {
             {tabValue === 1 && (
               <div className="flex gap-2">
                 {/* Odontogram */}
-                <div className="p-4 w-[30%]">
+                <div className="p-4 flex-1 bg-gray-100 rounded-md ">
                   <MyOdontogram patientId={id} />
                 </div>
                 {/* Records */}
