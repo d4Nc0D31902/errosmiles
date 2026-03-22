@@ -78,12 +78,7 @@ const Sidebar = ({ open, toggleOpen }) => {
       category: "Records",
       items: [
         // { label: "Orders", icon: <ShoppingBagIcon />, path: "/orders" },
-        {
-          label: "Patients",
-          icon: <PersonalInjuryIcon />,
-          path: "/patients",
-          matchPaths: ["/patients", "/patient"],
-        },
+        { label: "Patients", icon: <PersonalInjuryIcon />, path: "/patients" },
         {
           label: "Documents",
           icon: <FolderIcon />,
@@ -150,9 +145,28 @@ const Sidebar = ({ open, toggleOpen }) => {
                     </p>
                   )}
                   {category.items.map((item) => {
-                    const isActive = item.matchPaths?.some((path) =>
-                      location.pathname.startsWith(path),
-                    );
+                    const isActive = (() => {
+                      const path = item.path;
+
+                      // 1. Root path → exact match only
+                      if (path === "/") {
+                        return location.pathname === "/";
+                      }
+
+                      // 2. Patients special case (handles /patient/:id)
+                      if (path === "/patients") {
+                        return (
+                          location.pathname.startsWith("/patients") ||
+                          location.pathname.startsWith("/patient/")
+                        );
+                      }
+
+                      // 3. Default → safe prefix match (with boundary)
+                      return (
+                        location.pathname.startsWith(path + "/") ||
+                        location.pathname === path
+                      );
+                    })();
 
                     if (item.items) {
                       return (
