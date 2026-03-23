@@ -110,12 +110,18 @@ const Records = ({ patientId }) => {
             key={record.id}
             title={
               <div className="bg-white rounded-md p-5 shadow-sm mb-5 flex flex-col gap-2 w-full">
-                <Typography>
-                  <strong>Date:</strong>{" "}
-                  {record.record_date
-                    ? new Date(record.record_date).toLocaleDateString()
-                    : "N/A"}
-                </Typography>
+                <div className="flex gap-2">
+                  <Typography>
+                    <strong>Date:</strong>{" "}
+                    {record.record_date
+                      ? new Date(record.record_date).toLocaleDateString()
+                      : "N/A"}
+                  </Typography>
+                  <Typography>-</Typography>
+                  <Typography>
+                    <strong>Tooth #:</strong> {record.tooth_number || "N/A"}
+                  </Typography>
+                </div>
 
                 <Table
                   columns={columns}

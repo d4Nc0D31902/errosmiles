@@ -66,7 +66,7 @@ const MyOdontogram = ({ patientId }) => {
           key={selectedIds.join(",")}
           defaultSelected={selectedIds}
           onChange={handleChange}
-          // readOnly
+          readOnly
           className="w-full h-full"
           // showLabels
         />
