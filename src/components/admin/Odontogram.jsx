@@ -13,7 +13,7 @@ const MyOdontogram = ({ patientId }) => {
       if (!patientId) return;
 
       const { data, error } = await supabase
-        .from("patient_records") 
+        .from("patient_records")
         .select("*")
         .eq("patient_id", patientId);
 
@@ -66,7 +66,9 @@ const MyOdontogram = ({ patientId }) => {
           key={selectedIds.join(",")}
           defaultSelected={selectedIds}
           onChange={handleChange}
+          // readOnly
           className="w-full h-full"
+          // showLabels
         />
       </div>
     </div>

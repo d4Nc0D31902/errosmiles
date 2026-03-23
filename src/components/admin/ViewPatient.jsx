@@ -261,7 +261,7 @@ const ViewPatient = () => {
                   <MyOdontogram patientId={id} />
                 </div>
                 {/* Records */}
-                <div className="flex-1 bg-gray-100 rounded-md">
+                <div className="flex-1 bg-gray-100 rounded-md p-5">
                   <Records patientId={id} />
                 </div>
               </div>

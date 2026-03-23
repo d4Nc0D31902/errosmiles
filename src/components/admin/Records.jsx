@@ -103,7 +103,7 @@ const Records = ({ patientId }) => {
   }
 
   return (
-    <div className="p-5 w-full h-[600px] overflow-y-auto">
+    <div className="p-5 w-full h-[650px] overflow-auto">
       <Steps direction="vertical" progressDot>
         {records.map((record) => (
           <Step
