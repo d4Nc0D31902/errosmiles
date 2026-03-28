@@ -8,17 +8,20 @@ import {
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import supabase from "../utils/Supabase";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import SellIcon from "@mui/icons-material/Sell";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
-import FolderIcon from "@mui/icons-material/Folder";
-import ReceiptIcon from "@mui/icons-material/Receipt";
-import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import PersonalInjuryIcon from "@mui/icons-material/PersonalInjury";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import GroupIcon from "@mui/icons-material/Group";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import MedicationIcon from "@mui/icons-material/Medication";
+import BiotechIcon from "@mui/icons-material/Biotech";
 
 const MINI_WIDTH = 72;
 const FULL_WIDTH = 250;
@@ -90,38 +93,48 @@ const Sidebar = ({ open, toggleOpen }) => {
 
   const navCategories = [
     {
-      category: "Main Menu",
       items: [
         // { label: "Home", icon: <HomeOutlinedIcon />, path: "/" },
-        { label: "Dashboard", icon: <PieChartIcon />, path: "/" },
+        { label: "Dashboard", icon: <DashboardIcon />, path: "/" },
       ],
     },
     {
-      category: "Records",
+      category: "Clinic",
       items: [
         // { label: "Orders", icon: <ShoppingBagIcon />, path: "/orders" },
+        {
+          label: "Reservations",
+          icon: <EventAvailableIcon />,
+          path: "/reservations",
+        },
         { label: "Patients", icon: <PersonalInjuryIcon />, path: "/patients" },
         {
-          label: "Documents",
-          icon: <FolderIcon />,
-          items: [
-            {
-              label: "Invoices",
-              icon: <ReceiptIcon />,
-              path: "/documents/invoices",
-            },
-            {
-              label: "Reports",
-              icon: <ArticleIcon />,
-              path: "/documents/reports",
-            },
-          ],
+          label: "Treatments",
+          icon: <MedicalServicesIcon />,
+          path: "/treatments",
+        },
+        { label: "Staff List", icon: <GroupIcon />, path: "/staffs" },
+      ],
+    },
+    {
+      category: "Finance",
+      items: [
+        { label: "Accounts", icon: <PaymentsIcon />, path: "/accounts" },
+        { label: "Sales", icon: <BarChartIcon />, path: "/sales" },
+        { label: "Purchases", icon: <ReceiptIcon />, path: "/purchases" },
+        {
+          label: "Payment Method",
+          icon: <CreditCardIcon />,
+          path: "/payment-method",
         },
       ],
     },
     {
-      category: "Management",
-      items: [{ label: "Users", icon: <PeopleIcon />, path: "/users" }],
+      category: "Physical Asset",
+      items: [
+        { label: "Stocks", icon: <MedicationIcon />, path: "/stocks" },
+        { label: "Peripherals", icon: <BiotechIcon />, path: "/peripherals" },
+      ],
     },
   ];
 
@@ -329,9 +342,13 @@ const Sidebar = ({ open, toggleOpen }) => {
                           navigate(`/login`);
                         }
                       }}
-                      className="flex items-center gap-2"
+                      className={`flex items-center gap-2 ${
+                        item.isLogout ? "text-red-500" : ""
+                      }`}
                     >
-                      {item.icon}
+                      <span className={item.isLogout ? "text-red-500" : ""}>
+                        {item.icon}
+                      </span>
                       {item.label}
                     </MenuItem>
                   ))}
