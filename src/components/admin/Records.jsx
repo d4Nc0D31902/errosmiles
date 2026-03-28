@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../utils/Supabase";
-import { Steps, Typography, Skeleton, Table } from "antd";
-
-const { Step } = Steps;
+import { Typography, Skeleton, Table } from "antd";
 
 const Records = ({ patientId }) => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
   const columns = [
+    {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+    },
+    {
+      title: "Tooth #",
+      dataIndex: "tooth",
+      key: "tooth",
+    },
     {
       title: "Dentist",
       dataIndex: "dentist",
@@ -26,67 +39,85 @@ const Records = ({ patientId }) => {
     },
   ];
 
-  const getTableData = (record) => [
-    {
+  const getTableData = (records) =>
+    records.map((record) => ({
       key: record.id,
+      date: record.record_date
+        ? new Date(record.record_date).toLocaleDateString()
+        : "N/A",
+      tooth: record.tooth_number || "N/A",
       dentist: record.dentist
         ? `${record.dentist.firstName} ${record.dentist.lastName}`
         : "N/A",
       diagnosis: record.diagnosis || "N/A",
       treatment: record.treatment || "N/A",
-    },
-  ];
+    }));
+
+  const fetchRecords = async (page = 1, pageSize = 10) => {
+    setLoading(true);
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const {
+      data: recordData,
+      error,
+      count,
+    } = await supabase
+      .from("patient_records")
+      .select("*", { count: "exact" })
+      .eq("patient_id", patientId)
+      .order("record_date", { ascending: false })
+      .range(from, to);
+
+    if (error) {
+      console.error("Error fetching patient records:", error);
+      setLoading(false);
+      return;
+    }
+
+    if (!recordData || recordData.length === 0) {
+      setRecords([]);
+      setPagination((prev) => ({ ...prev, total: count || 0 }));
+      setLoading(false);
+      return;
+    }
+
+    const recordsWithExtras = await Promise.all(
+      recordData.map(async (record) => {
+        const { data: dentistData } = await supabase
+          .from("profiles")
+          .select("firstName, lastName")
+          .eq("id", record.dentist_id)
+          .single();
+
+        return {
+          ...record,
+          dentist: dentistData || null,
+        };
+      }),
+    );
+
+    setRecords(recordsWithExtras);
+    setPagination((prev) => ({
+      ...prev,
+      current: page,
+      pageSize,
+      total: count || 0,
+    }));
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchRecords = async () => {
-      setLoading(true);
-
-      const { data: recordData, error: recordError } = await supabase
-        .from("patient_records")
-        .select("*")
-        .eq("patient_id", patientId)
-        .order("record_date", { ascending: false });
-
-      if (recordError) {
-        console.error("Error fetching patient records:", recordError);
-        setLoading(false);
-        return;
-      }
-
-      if (!recordData || recordData.length === 0) {
-        setRecords([]);
-        setLoading(false);
-        return;
-      }
-
-      const recordsWithExtras = await Promise.all(
-        recordData.map(async (record) => {
-          const { data: dentistData } = await supabase
-            .from("profiles")
-            .select("firstName, lastName")
-            .eq("id", record.dentist_id)
-            .single();
-
-          const { data: notesData } = await supabase
-            .from("patient_record_notes")
-            .select("id, note_text, created_at")
-            .eq("record_id", record.id)
-            .order("created_at", { ascending: true });
-
-          return {
-            ...record,
-            dentist: dentistData || null,
-            notes: notesData || [],
-          };
-        }),
-      );
-
-      setRecords(recordsWithExtras);
-      setLoading(false);
-    };
-
-    if (patientId) fetchRecords();
+    if (patientId) {
+      fetchRecords(pagination.current, pagination.pageSize);
+    }
   }, [patientId]);
+
+  const handleTableChange = (paginationConfig) => {
+    fetchRecords(paginationConfig.current, paginationConfig.pageSize);
+  };
 
   if (loading) {
     return (
@@ -103,38 +134,16 @@ const Records = ({ patientId }) => {
   }
 
   return (
-    <div className="p-5 w-full h-[650px] overflow-auto">
-      <Steps direction="vertical" progressDot>
-        {records.map((record) => (
-          <Step
-            key={record.id}
-            title={
-              <div className="bg-white rounded-md p-5 shadow-sm mb-5 flex flex-col gap-2 w-full">
-                <div className="flex gap-2">
-                  <Typography>
-                    <strong>Date:</strong>{" "}
-                    {record.record_date
-                      ? new Date(record.record_date).toLocaleDateString()
-                      : "N/A"}
-                  </Typography>
-                  <Typography>-</Typography>
-                  <Typography>
-                    <strong>Tooth #:</strong> {record.tooth_number || "N/A"}
-                  </Typography>
-                </div>
-
-                <Table
-                  columns={columns}
-                  dataSource={getTableData(record)}
-                  pagination={false}
-                  size="large"
-                  bordered
-                />
-              </div>
-            }
-          />
-        ))}
-      </Steps>
+    <div className="p-5 w-full">
+      <Table
+        columns={columns}
+        dataSource={getTableData(records)}
+        bordered
+        size="large"
+        loading={loading}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
     </div>
   );
 };
