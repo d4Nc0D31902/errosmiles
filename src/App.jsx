@@ -1,18 +1,47 @@
-import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Spin } from "antd"; // import Ant Design loader
+import supabase from "./components/utils/Supabase";
 
 import Home from "./components/Home";
 import PatientList from "./components/admin/PatientList";
 import ViewPatient from "./components/admin/ViewPatient";
-import Header from "./components/layouts/Header";
-import Footer from "./components/layouts/Footer";
 import Register from "./components/user/Register";
 import Login from "./components/user/Login";
-import ProtectedRoute from "./components/route/ProtectedRoute";
+
+// Wrapper for protected routes
+const RequireAuth = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const [sessionExists, setSessionExists] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSessionExists(!!data.session);
+      setLoading(false);
+    };
+    checkSession();
+  }, []);
+
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+
+  return sessionExists ? children : <Navigate to="/login" replace />;
+};
 
 const App = () => {
   const location = useLocation();
-
   const hideLayoutRoutes = ["/login", "/register"];
   const hideLayout = hideLayoutRoutes.includes(location.pathname);
 
@@ -20,14 +49,37 @@ const App = () => {
     <div>
       {/* {!hideLayout && <Header />} */}
 
+      {/* Admin routes protected by session */}
       <Routes>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/patients" element={<PatientList />} />
-          <Route path="/patient/:id" element={<ViewPatient />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-        </Route>
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <Home />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/patients"
+          element={
+            <RequireAuth>
+              <PatientList />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/patient/:id"
+          element={
+            <RequireAuth>
+              <ViewPatient />
+            </RequireAuth>
+          }
+        />
+
+        {/* Public user routes */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
 
       {/* {!hideLayout && <Footer />} */}

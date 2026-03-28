@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Drawer, Box, Avatar } from "@mui/material";
+import { Drawer, Box, Avatar, Menu, MenuItem } from "@mui/material";
 import {
   MenuOutlined,
   ExpandMore,
@@ -30,6 +30,17 @@ const Sidebar = ({ open, toggleOpen }) => {
   const location = useLocation();
   const dropdownRef = useRef(null);
   const [dropdownHeight, setDropdownHeight] = useState(0);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     // Get current authenticated user
@@ -62,8 +73,19 @@ const Sidebar = ({ open, toggleOpen }) => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        throw error;
+      }
+      localStorage.removeItem("loginTime");
+
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert(err.message || "Failed to logout.");
+    }
   };
 
   const navCategories = [
@@ -106,6 +128,7 @@ const Sidebar = ({ open, toggleOpen }) => {
   const botNav = [
     { label: "Settings", icon: <SettingsIcon /> },
     { label: "Help", icon: <HelpIcon /> },
+    { label: "Logout", icon: <Logout />, isLogout: true },
   ];
 
   return (
@@ -244,7 +267,7 @@ const Sidebar = ({ open, toggleOpen }) => {
 
           {/* Bottom Section */}
           <div className="flex flex-col">
-            {botNav.map((navItem) => (
+            {/* {botNav.map((navItem) => (
               <div
                 key={navItem.label}
                 onClick={() =>
@@ -257,26 +280,63 @@ const Sidebar = ({ open, toggleOpen }) => {
                 {navItem.icon}
                 {open && <span>{navItem.label}</span>}
               </div>
-            ))}
+            ))} */}
 
             {/* Authenticated User */}
             {userProfile && (
-              <div className="flex items-center gap-2 px-4 py-4 border-t">
-                {/* Avatar with first letter of firstName */}
-                <Avatar sx={{ bgcolor: "#20a1df", width: 40, height: 40 }}>
-                  {userProfile.firstName
-                    ? userProfile.firstName[0].toUpperCase()
-                    : "U"}
-                </Avatar>
-                {open && (
-                  <div className="flex items-center gap-2 w-auto justify-between">
-                    <div className="flex flex-col gap-0 m-0 justify-center items-start">
-                      <p className="text-md font-bold">{`${userProfile.firstName}`}</p>
-                      <p className="text-sm">{userProfile.eid}</p>
+              <>
+                <div
+                  onClick={handleMenuOpen}
+                  className="flex items-center gap-2 px-4 py-4 border-t cursor-pointer hover:bg-gray-100"
+                >
+                  <Avatar sx={{ bgcolor: "#20a1df", width: 40, height: 40 }}>
+                    {userProfile.firstName
+                      ? userProfile.firstName[0].toUpperCase()
+                      : "U"}
+                  </Avatar>
+
+                  {open && (
+                    <div className="flex items-center gap-2 w-auto justify-between">
+                      <div className="flex flex-col gap-0 m-0 justify-center items-start">
+                        <p className="text-md font-bold">
+                          {userProfile.firstName}
+                        </p>
+                        <p className="text-sm">{userProfile.eid}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={openMenu}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                  transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  PaperProps={{
+                    className: "w-56",
+                  }}
+                >
+                  {botNav.map((item) => (
+                    <MenuItem
+                      key={item.label}
+                      onClick={() => {
+                        handleMenuClose();
+
+                        if (item.isLogout) {
+                          handleLogout();
+                        } else {
+                          navigate(`/login`);
+                        }
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      {item.icon}
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
             )}
           </div>
         </Box>

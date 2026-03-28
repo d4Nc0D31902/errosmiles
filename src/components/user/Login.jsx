@@ -21,23 +21,28 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { eid, password } = formData;
-    const email = `${eid}@errosmiles.com`;
+    try {
+      const { eid, password } = formData;
+      const email = `${eid}@errosmiles.com`;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      alert(error.message);
-      return;
+      if (error) {
+        throw error;
+      }
+      if (!data?.session) {
+        throw new Error("Login failed. No session found.");
+      }
+      localStorage.setItem("loginTime", Date.now());
+
+      navigate("/");
+    } catch (err) {
+      console.error("Login error:", err);
+      alert(err.message || "Something went wrong during login.");
     }
-
-    // store login timestamp
-    localStorage.setItem("loginTime", Date.now());
-
-    navigate("/");
   };
 
   return (
