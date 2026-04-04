@@ -10,7 +10,6 @@ const PatientDetails = ({ patient, loading }) => {
   const [originalData, setOriginalData] = useState({});
   const [saving, setSaving] = useState(false);
 
-  // Initialize formData and originalData when patient loads
   useEffect(() => {
     if (patient) {
       const initData = {
@@ -57,7 +56,7 @@ const PatientDetails = ({ patient, loading }) => {
       console.error(error);
     } else {
       message.success("Patient updated successfully");
-      setOriginalData(formData); // update originalData to new saved state
+      setOriginalData(formData);
     }
   };
 
@@ -65,7 +64,6 @@ const PatientDetails = ({ patient, loading }) => {
     setFormData(originalData);
   };
 
-  // Check if formData has changed compared to originalData
   const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   if (loading) return <Skeleton active paragraph={{ rows: 10 }} />;

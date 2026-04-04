@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../utils/Supabase";
-import { Typography, Skeleton, Table } from "antd";
+import {
+  Typography,
+  Skeleton,
+  Table,
+  Input,
+  Button,
+  Modal,
+  Form,
+  DatePicker,
+  Select,
+} from "antd";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
-const Records = ({ patientId }) => {
+const Records = ({ patientId, onSuccess }) => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [form] = Form.useForm();
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: 0,
   });
 
@@ -38,6 +53,84 @@ const Records = ({ patientId }) => {
       key: "treatment",
     },
   ];
+
+  const showModal = (record = null) => {
+    if (record) {
+      setEditingRecord(record);
+      form.setFieldsValue({
+        record_date: dayjs(record.record_date),
+        tooth_number: record.tooth_number,
+        diagnosis: record.diagnosis,
+        treatment: record.treatment,
+      });
+    } else {
+      setEditingRecord(null);
+      form.resetFields();
+      form.setFieldsValue({ record_date: dayjs() });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const userId = (await supabase.auth.getUser()).data.user.id;
+
+      // Determine the record date:
+      const recordDate = editingRecord
+        ? editingRecord.record_date // keep existing for edits
+        : dayjs().format("YYYY-MM-DD"); // default to today for new records
+
+      if (editingRecord) {
+        // Update existing record
+        const { error } = await supabase
+          .from("patient_records")
+          .update({
+            record_date: recordDate,
+            tooth_number: values.tooth_number,
+            diagnosis: values.diagnosis,
+            treatment: values.treatment,
+          })
+          .eq("id", editingRecord.key);
+
+        if (error) {
+          console.error("Update error:", error);
+          return;
+        }
+      } else {
+        // Insert new record
+        const { error } = await supabase.from("patient_records").insert([
+          {
+            patient_id: patientId,
+            dentist_id: userId,
+            record_date: recordDate,
+            tooth_number: values.tooth_number,
+            diagnosis: values.diagnosis,
+            treatment: values.treatment,
+          },
+        ]);
+
+        if (error) {
+          console.error("Insert error:", error);
+          return;
+        }
+      }
+
+      // Refresh table
+      await fetchRecords(pagination.current, pagination.pageSize);
+
+      // Notify parent
+      if (onSuccess) onSuccess();
+
+      form.resetFields();
+      setEditingRecord(null);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Validation failed:", err);
+    }
+  };
+
+  const handleCancel = () => setIsModalOpen(false);
 
   const getTableData = (records) =>
     records.map((record) => ({
@@ -143,7 +236,99 @@ const Records = ({ patientId }) => {
         loading={loading}
         pagination={pagination}
         onChange={handleTableChange}
+        onRow={(record) => ({
+          onClick: () => {
+            const originalRecord = records.find((r) => r.id === record.key);
+            showModal(originalRecord);
+          },
+          style: { cursor: "pointer" },
+        })}
+        title={() => (
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold">Records</h3>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search..."
+                prefix={<SearchOutlined />}
+                style={{ width: 200 }}
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => showModal()}
+              />
+            </div>
+          </div>
+        )}
       />
+      <Modal
+        title="Add Record"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Save"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="Tooth Number"
+            name="tooth_number"
+            rules={[{ required: true, message: "Please select tooth number" }]}
+          >
+            <Select placeholder="Select tooth number">
+              {[
+                // Upper Right (1)
+                "18",
+                "17",
+                "16",
+                "15",
+                "14",
+                "13",
+                "12",
+                "11",
+                // Upper Left (2)
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                // Lower Left (3)
+                "38",
+                "37",
+                "36",
+                "35",
+                "34",
+                "33",
+                "32",
+                "31",
+                // Lower Right (4)
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+              ].map((tooth) => (
+                <Select.Option key={tooth} value={tooth}>
+                  Tooth {tooth}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Diagnosis" name="diagnosis">
+            <Input.TextArea rows={3} placeholder="Enter diagnosis" />
+          </Form.Item>
+
+          <Form.Item label="Treatment" name="treatment">
+            <Input.TextArea rows={3} placeholder="Enter treatment" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

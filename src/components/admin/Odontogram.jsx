@@ -4,7 +4,7 @@ import "react-odontogram/style.css";
 import { Skeleton } from "@mui/material";
 import supabase from "../utils/Supabase";
 
-const MyOdontogram = ({ patientId }) => {
+const MyOdontogram = ({ patientId, refreshKey }) => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -33,7 +33,7 @@ const MyOdontogram = ({ patientId }) => {
     };
 
     fetchPatientRecords();
-  }, [patientId]);
+  }, [patientId, refreshKey]);
 
   const handleChange = (teeth) => {
     console.log("Selected:", teeth);

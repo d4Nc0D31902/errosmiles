@@ -37,6 +37,7 @@ const ViewPatient = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [recordsRefreshKey, setRecordsRefreshKey] = useState(0);
 
   const showModal = () => setIsModalVisible(true);
   const hideModal = () => setIsModalVisible(false);
@@ -258,11 +259,14 @@ const ViewPatient = () => {
               <div className="flex gap-2">
                 {/* Odontogram */}
                 <div className="p-4 flex-1 bg-gray-100 rounded-md ">
-                  <MyOdontogram patientId={id} />
+                  <MyOdontogram patientId={id} refreshKey={recordsRefreshKey} />
                 </div>
                 {/* Records */}
                 <div className="flex-1 bg-gray-100 rounded-md p-5">
-                  <Records patientId={id} />
+                  <Records
+                    patientId={id}
+                    onSuccess={() => setRecordsRefreshKey((prev) => prev + 1)}
+                  />
                 </div>
               </div>
             )}
